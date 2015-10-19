@@ -42,7 +42,7 @@ public class PropogationDelay {
 			    broadcastCount++;
 			}
 		 
-		 System.out.println("Out of +"+i+ " peers "+ broadcastCount+" peers have broadcasted the transaction.");
+		 System.out.println("Out of "+i+ " peers "+ broadcastCount+" peers have broadcasted the transaction.");
 
 		 
         }//end of while
