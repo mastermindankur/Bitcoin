@@ -87,7 +87,7 @@ public class PropogationDelay  {
 	
 	void calculateAnnouncedNodes(TransactionConfidence tc, PeerGroup pg)
 	{
-		System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence().getConfidenceType());
+		System.out.println("TRANSACTION CONFIDENCE is ::"+ tc.getConfidenceType());
         List <Peer> peers= pg.getConnectedPeers();
         //System.out.println(" ----------LIST OF PEERS ---------------");
         
