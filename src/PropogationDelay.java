@@ -32,7 +32,7 @@ public class PropogationDelay  {
             	System.out.println(" Heard back Tx ....");
     			 long stopTime = System.currentTimeMillis();
     			 long elapsedTime = (stopTime - startTime);
-    			 System.out.println("Propogation Delay is "+elapsedTime);
+    			 System.out.println("Propogation Delay is "+ elapsedTime);
     			 //System.exit(1);
             }
 

@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.bitcoinj.core.*;
 import org.bitcoinj.core.Wallet.BalanceType;
+import org.bitcoinj.core.Wallet.SendResult;
 import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.params.MainNetParams;
@@ -50,7 +51,11 @@ public class TransferToWallet {
         Address to = new Address(params, ashWallet);
         try {
         	System.out.println("The following amount of coins are being sent "+0.0008*1000 +" mBTC");
-            Wallet.SendResult result = kit.wallet().sendCoins(kit.peerGroup(), to, value);
+            //Wallet.SendResult result = kit.wallet().sendCoins(kit.peerGroup(), to, value);
+        	
+        	PeerGroup pg =kit.peerGroup();
+        	pg.setMinBroadcastConnections(1);
+        	SendResult result = kit.wallet().sendCoins(kit.peerGroup(), to, value);
             System.out.println("coins sent. transaction hash: " + result.tx.getHashAsString());
             
             
