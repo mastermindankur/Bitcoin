@@ -29,14 +29,19 @@ public class PropogationDelay  {
             @Override
             public void onTransaction(Peer p, Transaction t)
             {
-            	System.out.println(" Our Trasnaction is " +tx.getHashAsString());
-            	System.out.println(" The Trasnaction recieved is"+t.getHashAsString());
-            	
+            	if(tx.getHashAsString().equals(t.getHashAsString()))
+            	{
             	System.out.println(" Heard back Tx ....");
     			 long stopTime = System.currentTimeMillis();
     			 long elapsedTime = (stopTime - startTime);
     			 System.out.println("Propogation Delay is "+ elapsedTime);
+    			 calculateAnnouncedNodes(t.getConfidence(),pg);
     			 //System.exit(1);
+            	}
+            	else
+            	{
+            		System.out.println(" Recieved a Tx which was not our Tx !!! ... Ignoring it");
+            	}
             }
 
         };
@@ -75,29 +80,39 @@ public class PropogationDelay  {
         
        while(true)
         {	
-    	   System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence().getConfidenceType());
-	        List <Peer> peers= pg.getConnectedPeers();
-	        //System.out.println(" ----------LIST OF PEERS ---------------");
-	        
-	        int i=0;
-	        for (i = 0; i < peers.size(); i++) {
-				//System.out.println(peers.get(i).getAddress() + " status ");
-				//tc.markBroadcastBy(peers.get(i).getAddress())
-	        }
-        
-		 int broadcastCount=0;
-		 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) tc.getBroadcastBy();
-		 //System.out.println(" ----------LIST OF PEERS that have announced  Tx ---------------");
-		 for (PeerAddress pa : pas) {
-			    //System.out.println(pa.getAddr());
-			    broadcastCount++;
-			}
-		 
-		 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have announced  the tx");
-		 Thread.sleep(5000);
+    	   calculateAnnouncedNodes(tc,pg);
         }//end of while
        
         }
+	
+	void calculateAnnouncedNodes(TransactionConfidence tc, PeerGroup pg)
+	{
+		System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence().getConfidenceType());
+        List <Peer> peers= pg.getConnectedPeers();
+        //System.out.println(" ----------LIST OF PEERS ---------------");
+        
+        int i=0;
+        for (i = 0; i < peers.size(); i++) {
+			//System.out.println(peers.get(i).getAddress() + " status ");
+			//tc.markBroadcastBy(peers.get(i).getAddress())
+        }
+    
+	 int broadcastCount=0;
+	 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) tc.getBroadcastBy();
+	 //System.out.println(" ----------LIST OF PEERS that have announced  Tx ---------------");
+	 for (PeerAddress pa : pas) {
+		    //System.out.println(pa.getAddr());
+		    broadcastCount++;
+		}
+	 
+	 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have announced  the tx");
+	 try {
+		Thread.sleep(5000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
         
         
 	}
