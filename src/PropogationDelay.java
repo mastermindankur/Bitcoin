@@ -74,19 +74,19 @@ public class PropogationDelay  {
         {	
     	   System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence().getConfidenceType());
 	        List <Peer> peers= pg.getConnectedPeers();
-	        System.out.println(" ----------LIST OF PEERS ---------------");
+	        //System.out.println(" ----------LIST OF PEERS ---------------");
 	        
 	        int i=0;
 	        for (i = 0; i < peers.size(); i++) {
-				System.out.println(peers.get(i).getAddress() + " status ");
+				//System.out.println(peers.get(i).getAddress() + " status ");
 				//tc.markBroadcastBy(peers.get(i).getAddress())
 	        }
         
 		 int broadcastCount=0;
 		 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) tc.getBroadcastBy();
-		 System.out.println(" ----------LIST OF PEERS that have announced  Tx ---------------");
+		 //System.out.println(" ----------LIST OF PEERS that have announced  Tx ---------------");
 		 for (PeerAddress pa : pas) {
-			    System.out.println(pa.getAddr());
+			    //System.out.println(pa.getAddr());
 			    broadcastCount++;
 			}
 		 
