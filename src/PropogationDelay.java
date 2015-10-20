@@ -31,7 +31,7 @@ public class PropogationDelay  {
             {
             	System.out.println(" Heard back Tx ....");
     			 long stopTime = System.currentTimeMillis();
-    			 long elapsedTime = (stopTime - startTime)/1000;
+    			 long elapsedTime = (stopTime - startTime);
     			 System.out.println("Propogation Delay is "+elapsedTime);
     			 //System.exit(1);
             }
@@ -44,11 +44,16 @@ public class PropogationDelay  {
 			public void onConfidenceChanged(TransactionConfidence tc,
 					ChangeReason arg1) {
 				// TODO Auto-generated method stub
-					 System.out.println(tc.getConfidenceType());
-	    			 long stopTime = System.currentTimeMillis();
-	    			 long elapsedTime = (stopTime - startTime)/1000;
-	    			 System.out.println("Propogation Delay is "+elapsedTime);
-	    			 //System.exit(1);
+				if(tc.getConfidenceType()==TransactionConfidence.ConfidenceType.BUILDING)
+				{
+					System.out.println("Onconfidence changed tx confidence is ........"+ tc.getConfidenceType());
+					System.out.println(arg1.toString());
+						 System.out.println(tc.getConfidenceType());
+		    			 long stopTime = System.currentTimeMillis();
+		    			 long elapsedTime = (stopTime - startTime);
+		    			 System.out.println("Propogation Delay is "+elapsedTime);
+		    			 System.exit(1);
+				} // end of if
 				
 			}
   
@@ -60,13 +65,14 @@ public class PropogationDelay  {
         System.out.println("Setting the listener on broadcast Tx");
         pg.addOnTransactionBroadcastListener(listener);
         
-        System.out.println("Trasaction Confidence is ::"+ tx.getConfidence() );
+        System.out.println("Trasaction Confidence is ::"+ tx.getConfidence().getConfidenceType());
         TransactionConfidence tc= tx.getConfidence();
         tc.addEventListener(tcListener);
+       
         
        while(true)
         {	
-    	   System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence() );
+    	   System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence().getConfidenceType());
 	        List <Peer> peers= pg.getConnectedPeers();
 	        System.out.println(" ----------LIST OF PEERS ---------------");
 	        
@@ -78,20 +84,21 @@ public class PropogationDelay  {
         
 		 int broadcastCount=0;
 		 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) tc.getBroadcastBy();
-		 System.out.println(" ----------LIST OF PEERS that have broadcasted Tx ---------------");
+		 System.out.println(" ----------LIST OF PEERS that have announced  Tx ---------------");
 		 for (PeerAddress pa : pas) {
 			    System.out.println(pa.getAddr());
 			    broadcastCount++;
 			}
 		 
-		 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have broadcasted the tx");
-		 if (tx.getConfidence().toString().contains("best chain"))
+		 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have announced  the tx");
+		 
+		 /*if (tx.getConfidence().toString().contains("best chain"))
 		 {
 			 long stopTime = System.currentTimeMillis();
 			 long elapsedTime = (stopTime - startTime)/1000;
 			 System.out.println("Propogation Delay is "+elapsedTime);
 			 System.exit(1);
-		 }
+		 }*/
 		 
 		 Thread.sleep(5000);
         }//end of while
