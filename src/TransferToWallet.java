@@ -28,7 +28,7 @@ public class TransferToWallet {
 
     public static void main(String[] args) throws Exception {
     	
-    	 long startTime = System.currentTimeMillis();
+    	 long startTime = 0;
         // We use the WalletAppKit that handles all the boilerplate for us. Have a look at the Kit.java example for more details.
         NetworkParameters params = TestNet3Params.get();
         WalletAppKit kit = new WalletAppKit(params, new File("."), "sendrequest-example");
@@ -57,15 +57,13 @@ public class TransferToWallet {
            String txHash= result.tx.getHashAsString();
            String txHex = DatatypeConverter.printHexBinary(result.tx.unsafeBitcoinSerialize());
            
+           startTime = System.currentTimeMillis();
            pd.calculatePropogationDelay(result.tx,txHash, txHex, tr,startTime ,kit.peerGroup());
            
+           
            // tr.relayTransaction(txHex, startTime);
-            
            // System.out.println(" Calling the function to calculate delay");
             //ts.calculateTime(result.tx, result.tx.getHashAsString(), txHex,tr,startTime);
-            
-           
-            
             
         } catch (InsufficientMoneyException e) {
             System.out.println("Not enough coins in your wallet. Missing " + e.missing.getValue() + " satoshis are missing (including fees)");

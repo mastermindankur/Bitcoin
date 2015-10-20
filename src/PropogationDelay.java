@@ -4,35 +4,79 @@ import java.util.ListIterator;
 
 import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.PeerAddress;
+import org.bitcoinj.core.listeners.OnTransactionBroadcastListener;
 import org.bitcoinj.core.PeerGroup;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionConfidence.Listener;
 
 
-public class PropogationDelay {
+
+public class PropogationDelay  {
+	
+	OnTransactionBroadcastListener listener;
+	Listener tcListener;
+	
+	
+	
+	
 	
 	public void calculatePropogationDelay(Transaction tx,String txHash, String txHex,TransactionRelay tr,long startTime, PeerGroup pg) throws InterruptedException
 	{
 		
 		
-		 //code for broadcast transaction
-        pg.broadcastTransaction(tx);
+	    listener = new OnTransactionBroadcastListener() {
+            @Override
+            public void onTransaction(Peer p, Transaction t)
+            {
+            	System.out.println(" Heard back Tx");
+    			 long stopTime = System.currentTimeMillis();
+    			 long elapsedTime = (stopTime - startTime)/1000;
+    			 System.out.println("Propogation Delay is "+elapsedTime);
+    			 //System.exit(1);
+            }
+
+        };
         
+        tcListener =new Listener(){
+
+			@Override
+			public void onConfidenceChanged(TransactionConfidence tc,
+					ChangeReason arg1) {
+				// TODO Auto-generated method stub
+				if(tc.getConfidenceType()==TransactionConfidence.ConfidenceType.BUILDING)
+				{
+					 System.out.println("moved to Building stage");
+	    			 long stopTime = System.currentTimeMillis();
+	    			 long elapsedTime = (stopTime - startTime)/1000;
+	    			 System.out.println("Propogation Delay is "+elapsedTime);
+	    			 //System.exit(1);
+				}
+			}
+  
+        };
+     
+        //code for broadcast transaction
+        System.out.println("Broadcasted the tx");
+        pg.broadcastTransaction(tx, 1);
+        System.out.println("Setting the listener on broadcast Tx");
+        pg.addOnTransactionBroadcastListener(listener);
         
-        while(true)
-        {
-        	
-        Thread.sleep(5000);
-        List <Peer> peers= pg.getConnectedPeers();
-        System.out.println(" ----------LIST OF PEERS ---------------");
+        System.out.println("Trasaction Confidence is"+ tx.getConfidence() );
+        TransactionConfidence tc= tx.getConfidence();
+        tc.addEventListener(tcListener);
         
-        int i=0;
-        for (i = 0; i < peers.size(); i++) {
-			System.out.println(peers.get(i).getAddress());
-        }
-        
-		 TransactionConfidence tc= tx.getConfidence();
-		 System.out.println("Transaction Confidence is "+ tc.getConfidenceType());
+       while(true)
+        {	
+    	   System.out.println("Trasaction Confidence is"+ tx.getConfidence() );
+	        List <Peer> peers= pg.getConnectedPeers();
+	        System.out.println(" ----------LIST OF PEERS ---------------");
+	        
+	        int i=0;
+	        for (i = 0; i < peers.size(); i++) {
+				System.out.println(peers.get(i).getAddress() + " status ");
+				//tc.markBroadcastBy(peers.get(i).getAddress())
+	        }
         
 		 int broadcastCount=0;
 		 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) tc.getBroadcastBy();
@@ -42,11 +86,13 @@ public class PropogationDelay {
 			    broadcastCount++;
 			}
 		 
-		 System.out.println("Out of "+i+ " peers "+ broadcastCount+" peers have broadcasted the transaction.");
-
+		 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have broadcasted the tx");
 		 
+		 Thread.sleep(5000);
         }//end of while
+       
+        }
+        
         
 	}
 
-}
