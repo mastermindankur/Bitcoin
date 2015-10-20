@@ -29,6 +29,9 @@ public class PropogationDelay  {
             @Override
             public void onTransaction(Peer p, Transaction t)
             {
+            	System.out.println(" Our Trasnaction is " +tx.getHashAsString());
+            	System.out.println(" The Trasnaction recieved is"+t.getHashAsString());
+            	
             	System.out.println(" Heard back Tx ....");
     			 long stopTime = System.currentTimeMillis();
     			 long elapsedTime = (stopTime - startTime);
@@ -47,8 +50,8 @@ public class PropogationDelay  {
 				if(tc.getConfidenceType()==TransactionConfidence.ConfidenceType.BUILDING)
 				{
 					System.out.println("Onconfidence changed tx confidence is ........"+ tc.getConfidenceType());
-					System.out.println(arg1.toString());
-						 System.out.println(tc.getConfidenceType());
+					//System.out.println(arg1.toString());
+						 //System.out.println(tc.getConfidenceType());
 		    			 long stopTime = System.currentTimeMillis();
 		    			 long elapsedTime = (stopTime - startTime);
 		    			 System.out.println("Propogation Delay is "+elapsedTime);
@@ -91,15 +94,6 @@ public class PropogationDelay  {
 			}
 		 
 		 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have announced  the tx");
-		 
-		 /*if (tx.getConfidence().toString().contains("best chain"))
-		 {
-			 long stopTime = System.currentTimeMillis();
-			 long elapsedTime = (stopTime - startTime)/1000;
-			 System.out.println("Propogation Delay is "+elapsedTime);
-			 System.exit(1);
-		 }*/
-		 
 		 Thread.sleep(5000);
         }//end of while
        
