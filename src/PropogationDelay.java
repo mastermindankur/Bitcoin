@@ -29,7 +29,7 @@ public class PropogationDelay  {
             @Override
             public void onTransaction(Peer p, Transaction t)
             {
-            	System.out.println(" Heard back Tx");
+            	System.out.println(" Heard back Tx ....");
     			 long stopTime = System.currentTimeMillis();
     			 long elapsedTime = (stopTime - startTime)/1000;
     			 System.out.println("Propogation Delay is "+elapsedTime);
@@ -44,14 +44,12 @@ public class PropogationDelay  {
 			public void onConfidenceChanged(TransactionConfidence tc,
 					ChangeReason arg1) {
 				// TODO Auto-generated method stub
-				if(tc.getConfidenceType()==TransactionConfidence.ConfidenceType.BUILDING)
-				{
-					 System.out.println("moved to Building stage");
+					 System.out.println(tc.getConfidenceType());
 	    			 long stopTime = System.currentTimeMillis();
 	    			 long elapsedTime = (stopTime - startTime)/1000;
 	    			 System.out.println("Propogation Delay is "+elapsedTime);
 	    			 //System.exit(1);
-				}
+				
 			}
   
         };
@@ -62,13 +60,13 @@ public class PropogationDelay  {
         System.out.println("Setting the listener on broadcast Tx");
         pg.addOnTransactionBroadcastListener(listener);
         
-        System.out.println("Trasaction Confidence is"+ tx.getConfidence() );
+        System.out.println("Trasaction Confidence is ::"+ tx.getConfidence() );
         TransactionConfidence tc= tx.getConfidence();
         tc.addEventListener(tcListener);
         
        while(true)
         {	
-    	   System.out.println("Trasaction Confidence is"+ tx.getConfidence() );
+    	   System.out.println("TRANSACTION CONFIDENCE is ::"+ tx.getConfidence() );
 	        List <Peer> peers= pg.getConnectedPeers();
 	        System.out.println(" ----------LIST OF PEERS ---------------");
 	        
@@ -87,6 +85,13 @@ public class PropogationDelay  {
 			}
 		 
 		 System.out.println("Out of "+i+ " peers "+ broadcastCount +" have broadcasted the tx");
+		 if (tx.getConfidence().toString().contains("best chain"))
+		 {
+			 long stopTime = System.currentTimeMillis();
+			 long elapsedTime = (stopTime - startTime)/1000;
+			 System.out.println("Propogation Delay is "+elapsedTime);
+			 System.exit(1);
+		 }
 		 
 		 Thread.sleep(5000);
         }//end of while
