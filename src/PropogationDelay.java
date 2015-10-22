@@ -9,6 +9,7 @@ import org.bitcoinj.core.PeerGroup;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionConfidence.Listener;
+import java.util.HashMap;
 
 
 
@@ -16,14 +17,13 @@ public class PropogationDelay  {
 	
 	OnTransactionBroadcastListener listener;
 	Listener tcListener;
+	HashMap nodes= new HashMap();
 	
 	
 	
 	
-	
-	public void calculatePropogationDelay(Transaction tx,String txHash, String txHex,TransactionRelay tr,long startTime, PeerGroup pg) throws InterruptedException
+	public void calculatePropogationDelay(final Transaction tx,String txHash, String txHex,TransactionRelay tr,final long startTime, final PeerGroup pg) throws InterruptedException
 	{
-		
 		
 	    listener = new OnTransactionBroadcastListener() {
             @Override
@@ -32,9 +32,23 @@ public class PropogationDelay  {
             	if(tx.getHashAsString().equals(t.getHashAsString()))
             	{
             	System.out.println(" Heard back Tx ....");
-    			 long stopTime = System.currentTimeMillis();
-    			 long elapsedTime = (stopTime - startTime);
-    			 System.out.println("Propogation Delay is "+ elapsedTime);
+    			 
+    			 
+    			 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) t.getConfidence().getBroadcastBy();
+    			 for (PeerAddress pa : pas) {
+    				 	if (!nodes.containsKey(pa.getAddr().toString())) // if node has not been visited before
+    				 	{
+    				     System.out.print(pa.getAddr());
+    				     long stopTime = System.currentTimeMillis();
+    	    			 long elapsedTime = (stopTime - startTime);
+    				     System.out.println(" Propogation Delay is "+ elapsedTime);
+    				     
+    				     nodes.put(pa.getAddr().toString(), ""); // inserting in to HashMap
+    				 	}
+    				}
+
+    			 
+    			 
     			 calculateAnnouncedNodes(t.getConfidence(),pg);
     			 //System.exit(1);
             	}
