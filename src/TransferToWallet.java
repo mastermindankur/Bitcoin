@@ -9,8 +9,10 @@ import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.params.MainNetParams;
 
+
 import java.util.List;
 import java.io.File;
+import java.io.FileInputStream;
 
 import org.bitcoin.*;
 
@@ -26,10 +28,13 @@ public class TransferToWallet {
 	static TransactionStatus ts=new TransactionStatus();
 	static TransactionRelay tr= new TransactionRelay();
 	static PropogationDelay pd =new PropogationDelay();
+	
 
     public static void main(String[] args) throws Exception {
     	
+    	
     	 long startTime = 0;
+    	 
         // We use the WalletAppKit that handles all the boilerplate for us. Have a look at the Kit.java example for more details.
         NetworkParameters params = TestNet3Params.get();
         WalletAppKit kit = new WalletAppKit(params, new File("."), "sendrequest-example");
@@ -41,7 +46,7 @@ public class TransferToWallet {
         
         //The Amount of Coins that need to be sent
         //float coinsTobeTransferred=.0000008;
-        Coin value = Coin.parseCoin(".0008");
+        Coin value = Coin.parseCoin(".00002");
 
        // Address of the wallet in which the tranfer is being done
         String ashWallet="mx8E7Q5AXdsWRsgTo8DsKCZdwZC2ooJDjx";
@@ -50,7 +55,7 @@ public class TransferToWallet {
         
         Address to = new Address(params, ashWallet);
         try {
-        	System.out.println("The following amount of coins are being sent "+0.0008*1000 +" mBTC");
+        	System.out.println("The following amount of coins are being sent "+0.0002*1000 +" mBTC");
             //Wallet.SendResult result = kit.wallet().sendCoins(kit.peerGroup(), to, value);
         	
         	PeerGroup pg =kit.peerGroup();
@@ -64,19 +69,13 @@ public class TransferToWallet {
            
            startTime = System.currentTimeMillis();
            pd.calculatePropogationDelay(result.tx,txHash, txHex, tr,startTime ,kit.peerGroup());
-           
-           
-           // tr.relayTransaction(txHex, startTime);
-           // System.out.println(" Calling the function to calculate delay");
-            //ts.calculateTime(result.tx, result.tx.getHashAsString(), txHex,tr,startTime);
-            
+               
         } catch (InsufficientMoneyException e) {
             System.out.println("Not enough coins in your wallet. Missing " + e.missing.getValue() + " satoshis are missing (including fees)");
             e.printStackTrace();
-            System.out.println("Send money from: " + kit.wallet().currentReceiveAddress().toString() + "failed, please add coins to your wallet");
+            System.out.println("Send money from: " + kit.wallet().currentReceiveAddress().toString() + " failed, please add coins to your wallet");
 
         }     
             }
 
-    
 }

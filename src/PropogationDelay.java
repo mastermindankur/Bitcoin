@@ -1,7 +1,12 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
-
 import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.PeerAddress;
 import org.bitcoinj.core.listeners.OnTransactionBroadcastListener;
@@ -13,18 +18,17 @@ import java.util.HashMap;
 
 
 
+
 public class PropogationDelay  {
 	
 	OnTransactionBroadcastListener listener;
 	Listener tcListener;
 	HashMap nodes= new HashMap();
-	
-	
-	
-	
-	public void calculatePropogationDelay(final Transaction tx,String txHash, String txHex,TransactionRelay tr,final long startTime, final PeerGroup pg) throws InterruptedException
-	{
-		
+	boolean done=false;
+
+	public void calculatePropogationDelay(final Transaction tx,String txHash, String txHex,TransactionRelay tr,final long startTime, final PeerGroup pg) throws InterruptedException 
+	{   	 	
+		//listener for On Trassaction heard back by peers
 	    listener = new OnTransactionBroadcastListener() {
             @Override
             public void onTransaction(Peer p, Transaction t)
@@ -32,8 +36,8 @@ public class PropogationDelay  {
             	if(tx.getHashAsString().equals(t.getHashAsString()))
             	{
             	System.out.println(" Heard back Tx ....");
-    			 
-    			 
+            	//System.out.println("address"+ p.getAddress());
+            	List <Peer> peers= pg.getConnectedPeers();
     			 java.util.HashSet <PeerAddress> pas=  (HashSet<PeerAddress>) t.getConfidence().getBroadcastBy();
     			 for (PeerAddress pa : pas) {
     				 	if (!nodes.containsKey(pa.getAddr().toString())) // if node has not been visited before
@@ -42,13 +46,17 @@ public class PropogationDelay  {
     				     long stopTime = System.currentTimeMillis();
     	    			 long elapsedTime = (stopTime - startTime);
     				     System.out.println(" Propogation Delay is "+ elapsedTime);
-    				     
+    				     writeToCSV(elapsedTime,done);
     				     nodes.put(pa.getAddr().toString(), ""); // inserting in to HashMap
+    				     // if all the peers have broadcasted the Tx
+    				    if(peers.size()==pas.size())
+    				     {
+    				    	   done=true;
+							   writeToCSV(elapsedTime,done);
+    				     }
     				 	}
     				}
 
-    			 
-    			 
     			 calculateAnnouncedNodes(t.getConfidence(),pg);
     			 //System.exit(1);
             	}
@@ -69,12 +77,12 @@ public class PropogationDelay  {
 				if(tc.getConfidenceType()==TransactionConfidence.ConfidenceType.BUILDING)
 				{
 					System.out.println("Onconfidence changed tx confidence is ........"+ tc.getConfidenceType());
-					//System.out.println(arg1.toString());
-						 //System.out.println(tc.getConfidenceType());
 		    			 long stopTime = System.currentTimeMillis();
 		    			 long elapsedTime = (stopTime - startTime);
 		    			 System.out.println("Propogation Delay is "+elapsedTime);
-		    			 System.exit(1);
+		    			 // inserting to excel
+		    			 	done=true;
+							writeToCSV(elapsedTime, done);
 				} // end of if
 				
 			}
@@ -92,7 +100,7 @@ public class PropogationDelay  {
         tc.addEventListener(tcListener);
        
         
-       while(true)
+       while(done==false)
         {	
     	   calculateAnnouncedNodes(tc,pg);
         }//end of while
@@ -127,7 +135,45 @@ public class PropogationDelay  {
 		e.printStackTrace();
 	}
 	}
+	
+	
+	
+public void writeToCSV(long elapsedTime, boolean done) 
+{
+	System.out.println("Writing to csv");
+	FileWriter writer;
+	try {
+		writer = new FileWriter("propogation.csv",true);
+		writer.append(elapsedTime+"");
+		if(done==false) // not ended yet, put another comma
+		{
+		writer.append(',');
+		}
+		if(done==true) // completed, put a new line character
+		{
+			System.out.println("Propogation completed to all nodes or tx got into Building stage");
+		writer.append('\n');
+		}
+		writer.flush();
+	    writer.close();
+	    
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+
+}
         
+
+public static void main(String args[]) throws IOException{
+	PropogationDelay p= new PropogationDelay();
+	p.writeToCSV(1,false);
+	p.writeToCSV(2,false);
+	p.writeToCSV(3,true);
+	p.writeToCSV(3,false);
+	p.writeToCSV(3,false);
+}
         
 	}
 
